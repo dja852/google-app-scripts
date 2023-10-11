@@ -12,12 +12,17 @@ function getCalendarIds() {
   var ssSheetIDs = ss.getSheetByName("Calendar IDs");
   var cals = CalendarApp.getAllCalendars();
 
-  for (var i = 0; i < cals.length; i++) {
+  calList = []
 
-    ssSheetIDs.getRange(i + 2, 1).setValue(cals[i].getName());
-    ssSheetIDs.getRange(i + 2, 2).setValue(cals[i].getId());
-
+  for (var i in cals) {
+    calList.push([
+      cals[i].getName(),
+      cals[i].getId()
+    ])
   }
+
+  ssSheetIDs.getRange(2, 1, calList.length, 2).setValues(calList)
+
 }
 
 function getCalendarEventsById() {
@@ -32,12 +37,36 @@ function getCalendarEventsById() {
 
   var calEvents = cal.getEvents(new Date(startTime), new Date(endTime));
 
-  for (var i = 0; i < calEvents.length; i++) {
+  var calData = [];
 
-    ssSheetData.getRange(i + 2, 1).setValue(calEvents[i].getTitle());
-    ssSheetData.getRange(i + 2, 2).setValue(calEvents[i].getDescription());
-    ssSheetData.getRange(i + 2, 3).setValue(calEvents[i].isAllDayEvent());
+  for (var i in calEvents) {
 
+    var isAllDayEvent = calEvents[i].isAllDayEvent();
+
+    calData.push([
+      calEvents[i].getTitle(),
+      calEvents[i].getDescription(),
+      isAllDayEvent,
+      isAllDayEvent ? calEvents[i].getAllDayStartDate() : calEvents[i].getStartTime(),
+      isAllDayEvent ? calEvents[i].getAllDayEndDate() : calEvents[i].getEndTime(),
+      calEvents[i].getLocation(),
+      calEvents[i].getCreators(),
+      calEvents[i].getDateCreated(),
+      getEventGuestList(calEvents[i].getGuestList(true))
+    ])
   }
+
+  ssSheetData.getRange(2, 1, calData.length, 9).setValues(calData)
   
+}
+
+function getEventGuestList(eventGuestList) {
+  var guestList = ""
+
+  for (var i = 0; i < eventGuestList.length; i++) {
+    guestList == "" ? guestList = eventGuestList[i].getEmail() : guestList += ";" + eventGuestList[i].getEmail();
+  }
+
+  return guestList;
+
 }
