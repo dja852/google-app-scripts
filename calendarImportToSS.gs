@@ -42,6 +42,7 @@ function getCalendarEventsById() {
   for (var i in calEvents) {
 
     var isAllDayEvent = calEvents[i].isAllDayEvent();
+    var guestList = calEvents[i].getGuestList(true);
 
     calData.push([
       calEvents[i].getTitle(),
@@ -52,11 +53,12 @@ function getCalendarEventsById() {
       calEvents[i].getLocation(),
       calEvents[i].getCreators(),
       calEvents[i].getDateCreated(),
-      getEventGuestList(calEvents[i].getGuestList(true))
+      getEventGuestList(guestList),
+      guestList.length
     ])
   }
 
-  ssSheetData.getRange(2, 1, calData.length, 9).setValues(calData)
+  ssSheetData.getRange(2, 1, calData.length, 10).setValues(calData)
   
 }
 
